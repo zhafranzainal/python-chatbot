@@ -2,6 +2,9 @@ import os
 
 import discord
 
+# get full or relative path to file
+hello_gif_path = os.path.join(os.path.dirname(__file__), 'hello.gif')
+
 # get default set of intents then enable intent to receive message content
 permissions = discord.Intents.default()
 permissions.message_content = True
@@ -27,7 +30,7 @@ async def on_message(message):
         return
 
     if message.content.lower().startswith("hello"):
-        await message.channel.send("Hello!")
+        await message.channel.send("Hello!", file=discord.File(hello_gif_path))
 
 
 # Run bot using TOKEN from env
