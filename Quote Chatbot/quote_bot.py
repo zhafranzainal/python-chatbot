@@ -4,6 +4,8 @@ import os
 import discord
 import requests
 
+from keep_alive import keep_alive
+
 
 def get_quote():
     response = requests.get("https://zenquotes.io/api/random")
@@ -37,6 +39,8 @@ async def on_message(message):
         quote = get_quote()
         await message.channel.send(quote)
 
+
+keep_alive()
 
 # Run bot using TOKEN from env
 client.run(os.environ['TOKEN'])
