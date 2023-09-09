@@ -14,6 +14,11 @@ client = discord.Client(intents=permissions)
 async def on_ready():
     print(f"Logged in as {client.user}")
 
+    # send message to each server it belongs to
+    for guild in client.guilds:
+        channel = guild.system_channel
+        await channel.send(f"{client.user} is online!")
+
 
 @client.event
 async def on_message(message):
