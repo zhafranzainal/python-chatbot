@@ -1,8 +1,7 @@
-import json
 import os
-
 import discord
 import requests
+import json
 
 from keep_alive import keep_alive
 
