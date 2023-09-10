@@ -1,5 +1,4 @@
 import os
-
 import discord
 
 # get full or relative path to file
