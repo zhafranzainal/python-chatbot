@@ -27,10 +27,14 @@ ta: Tamil
 vi: Vietnamese
 '''
 
+BOT_PREFIX = "!"  # bot's command prefix
+DEST_LANG = "en"  # destination language for translation
+
+translator = Translator()
+
 
 def get_translation(message):
-    translator = Translator()
-    translated = translator.translate(message, dest="en")
+    translated = translator.translate(message, dest=DEST_LANG)
     return translated.text
 
 
@@ -60,13 +64,13 @@ async def on_message(message):
 
     print(message.content)
 
-    translator = Translator()
-    detected_language = translator.detect(message.content).lang
+    if message.content.startswith(BOT_PREFIX):
 
-    if message.content.startswith("!"):
+        # alternative: extract text without prefix
+        # list_to_str = message.content[len(BOT_PREFIX):]
 
-        # split message into list using "!" as the separator
-        text = message.content.split("! ")
+        # split message into list using BOT_PREFIX as the separator
+        text = message.content.split(BOT_PREFIX + " ")
 
         # explicitly convert text in the list to string
         string_text = map(str, text)
@@ -74,7 +78,9 @@ async def on_message(message):
         # concatenate the list of strings into a single string
         list_to_str = "".join(string_text)
 
-        if detected_language == "en":
+        detected_language = translator.detect(list_to_str).lang
+
+        if detected_language == DEST_LANG:
             await message.channel.send(list_to_str)
         else:
             translated = get_translation(list_to_str)
