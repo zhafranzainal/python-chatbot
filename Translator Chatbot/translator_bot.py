@@ -66,7 +66,7 @@ async def on_message(message):
 
     if message.content.startswith(BOT_PREFIX):
 
-        # alternative: extract text without prefix
+        # better alternative: extract text without prefix
         # list_to_str = message.content[len(BOT_PREFIX):]
 
         # split message into list using BOT_PREFIX as the separator
