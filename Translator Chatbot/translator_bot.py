@@ -7,24 +7,26 @@ import discord
 from keep_alive import keep_alive
 from googletrans import Translator
 
+'''
+common language codes:-
+ar: Arabic
+bn: Bengali
+zh-cn: Chinese (Simplified)
+en: English
+tl: Filipino
+fr: French
+de: German
+id: Indonesian
+it: Italian
+ja: Japanese
+ko: Korean
+ms: Malay
+ru: Russian
+es: Spanish
+ta: Tamil
+vi: Vietnamese
+'''
 
-# common language codes:-
-# ar: Arabic
-# bn: Bengali
-# zh-cn: Chinese (Simplified)
-# en: English
-# tl: Filipino
-# fr: French
-# de: German
-# id: Indonesian
-# it: Italian
-# ja: Japanese
-# ko: Korean
-# ms: Malay
-# ru: Russian
-# es: Spanish
-# ta: Tamil
-# vi: Vietnamese
 
 def get_translation(message):
     translator = Translator()
