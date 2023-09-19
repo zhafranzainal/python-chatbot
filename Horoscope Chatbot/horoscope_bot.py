@@ -71,12 +71,18 @@ async def on_ready():
 async def on_message(message):
     if message.content.lower() in signs:
         sign = message.content.lower()
+        sign_name = sign.title()
         horoscope = get_horoscope(sign)
-        quote = f"Today's horoscope for {sign.title()}:\n> " \
+
+        quote = f"Today's horoscope for {sign_name}:\n> " \
                 f"Current date: {horoscope.current_date}\n> \n> " \
                 f"{horoscope.description}"
 
+        # get full or relative path to file
+        zodiac_image_path = os.path.join(os.path.dirname(__file__), f'Images/{sign_name}.png')
+
         await message.channel.send(quote)
+        await message.channel.send(file=discord.File(zodiac_image_path))
 
 
 keep_alive()
