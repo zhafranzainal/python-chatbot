@@ -3,6 +3,7 @@ import discord
 import requests
 
 from bs4 import BeautifulSoup
+from keep_alive import keep_alive
 
 # define a dictionary that maps zodiac signs to their corresponding numbers
 signs = {
@@ -77,6 +78,8 @@ async def on_message(message):
 
         await message.channel.send(quote)
 
+
+keep_alive()
 
 # run bot using TOKEN from env
 bot.run(os.environ['TOKEN'])
