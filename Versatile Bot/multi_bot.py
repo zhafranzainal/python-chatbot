@@ -18,11 +18,14 @@ class MultiBot(commands.Bot):
         # Initialize bot
         super().__init__(command_prefix="!", intents=permissions, case_insensitive=True)
 
-        # Create session for making HTTP requests
-        self.session = aiohttp.ClientSession()
+        # Initialize session
+        self.session = None
 
     async def on_ready(self):
         print(f"Logged in as {self.user}")
+
+        # Create session for making HTTP requests
+        self.session = aiohttp.ClientSession()
 
         # Send message to each server the bot belongs to
         for guild in self.guilds:
@@ -40,7 +43,7 @@ class MultiBot(commands.Bot):
 
 
 bot = MultiBot()
-keep_alive()
+# keep_alive()
 
 # Run bot using TOKEN from env
 bot.run(os.environ['TOKEN'])
