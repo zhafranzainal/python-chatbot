@@ -10,7 +10,7 @@ MEAL_CHOICES = {
     "$dinner": ["sushi", "french fries"],
 }
 
-# get default set of intents then enable intent to receive message content
+# create default set of intents then enable intent to receive message content
 permissions = discord.Intents.default()
 permissions.message_content = True
 
@@ -52,7 +52,7 @@ async def on_message(message):
 
             recommendation = "Food recommendation: " + choice
 
-            # get full or relative path to file
+            # get image file path
             food_image_path = os.path.join(os.path.dirname(__file__), f'Images/{choice}.png')
 
             await message.channel.send(recommendation)
