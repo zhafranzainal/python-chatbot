@@ -21,6 +21,13 @@ signs = {
 }
 
 
+class Horoscope:
+
+    def __init__(self, current_date, description):
+        self.current_date = current_date
+        self.description = description
+
+
 def get_horoscope(sign):
     url = f"https://www.horoscope.com/us/horoscopes/general/horoscope-general-daily-today.aspx?sign={signs.get(sign, '')}"
 
@@ -34,36 +41,42 @@ def get_horoscope(sign):
     container = html.find("p")
 
     # remove leading/trailing whitespace then split between dates and actual horoscope message
-    horoscope_message = container.text.strip().split(" - ")[1]
+    split_message = container.text.strip().split(" - ")
+    current_date = split_message[0]
+    description = split_message[1]
 
-    return horoscope_message
+    return Horoscope(current_date, description)
 
 
 # get default set of intents then enable intent to receive message content
 permissions = discord.Intents.default()
 permissions.message_content = True
 
-# represent bot
-client = discord.Client(intents=permissions)
+# create bot
+bot = discord.Client(intents=permissions)
 
 
-@client.event
+@bot.event
 async def on_ready():
-    print(f"Logged in as {client.user}")
+    print(f"Logged in as {bot.user}")
 
     # send message to each server it belongs to
-    for guild in client.guilds:
+    for guild in bot.guilds:
         channel = guild.system_channel
-        await channel.send(f"{client.user} is online!")
+        await channel.send(f"{bot.user} is online!")
 
 
-@client.event
+@bot.event
 async def on_message(message):
     if message.content.lower() in signs:
         sign = message.content.lower()
-        quote = get_horoscope(sign)
-        await message.channel.send(f"Here's today's horoscope for {sign.title()}:\n> \"{quote}\"")
+        horoscope = get_horoscope(sign)
+        quote = f"Today's horoscope for {sign.title()}:\n> " \
+                f"Current date: {horoscope.current_date}\n> \n> " \
+                f"{horoscope.description}"
+
+        await message.channel.send(quote)
 
 
 # run bot using TOKEN from env
-client.run(os.environ['TOKEN'])
+bot.run(os.environ['TOKEN'])
