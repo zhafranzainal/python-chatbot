@@ -3,6 +3,13 @@ import discord
 
 from keep_alive import keep_alive
 
+# define a dictionary that maps meals to their corresponding food choices
+MEAL_CHOICES = {
+    "$breakfast": ["sandwich", "salad"],
+    "$lunch": ["spaghetti", "tacos"],
+    "$dinner": ["sushi", "french fries"],
+}
+
 # get default set of intents then enable intent to receive message content
 permissions = discord.Intents.default()
 permissions.message_content = True
@@ -23,51 +30,33 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if message.content.lower().startswith("$hello"):
-        await message.channel.send(
-            "Hello! \nWelcome to Meal Recommender System \n "
-            "$breakfast / $lunch / $dinner \n "
-            "1: food / 2: snack \n "
-            "e.g.: $breakfast 2"
-        )
+    text = message.content.lower()
 
-    elif message.content.lower().startswith("$breakfast"):
+    if text.startswith("$hello"):
+        response = "Hello!\n> Welcome to Meal Recommender System\n> " \
+                   "$breakfast / $lunch / $dinner\n> " \
+                   "1: food / 2: snack\n> " \
+                   "e.g.: $breakfast 2"
 
-        text = message.content.split("$breakfast ")
-        list_to_str = "".join(map(str, text))
+        await message.channel.send(response)
 
-        if int(list_to_str) == 1:
-            choice = "sandwich"
-        else:
-            choice = "salad"
+    for meal, choices in MEAL_CHOICES.items():
 
-    elif message.content.lower().startswith("$lunch"):
+        if text.startswith(meal):
+            choice_number = text.split(meal)[-1].strip()
 
-        text = message.content.split("$lunch ")
-        list_to_str = "".join(map(str, text))
+            try:
+                choice = choices[int(choice_number) - 1]
+            except (ValueError, IndexError):
+                choice = "Invalid choice. Please use 1 or 2."
 
-        if int(list_to_str) == 1:
-            choice = "spaghetti"
-        else:
-            choice = "tacos"
+            recommendation = "Food recommendation: " + choice
 
-    elif message.content.lower().startswith("$dinner"):
+            # get full or relative path to file
+            food_image_path = os.path.join(os.path.dirname(__file__), f'Images/{choice}.png')
 
-        text = message.content.split("$dinner ")
-        list_to_str = "".join(map(str, text))
-
-        if int(list_to_str) == 1:
-            choice = "sushi"
-        else:
-            choice = "french fries"
-
-    recommendation = "Food recommendation: " + choice
-
-    # get full or relative path to file
-    food_image_path = os.path.join(os.path.dirname(__file__), f'Images/{choice}.png')
-
-    await message.channel.send(recommendation)
-    await message.channel.send(file=discord.File(food_image_path))
+            await message.channel.send(recommendation)
+            await message.channel.send(file=discord.File(food_image_path))
 
 
 keep_alive()
