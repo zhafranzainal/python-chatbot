@@ -10,6 +10,23 @@ MEAL_CHOICES = {
     "$dinner": ["sushi", "french fries"],
 }
 
+
+def get_recommendation(text):
+    for meal, choices in MEAL_CHOICES.items():
+
+        if text.startswith(meal):
+
+            # split text using meal as separator, get choice number, then remove leading/trailing whitespace
+            choice_number = text.split(meal)[-1].strip()
+
+            try:
+                choice = choices[int(choice_number) - 1]
+            except (ValueError, IndexError):
+                choice = "Invalid choice. Please use 1 or 2."
+
+            return choice
+
+
 # create default set of intents then enable intent to receive message content
 permissions = discord.Intents.default()
 permissions.message_content = True
@@ -40,18 +57,10 @@ async def on_message(message):
 
         await message.channel.send(response)
 
-    for meal, choices in MEAL_CHOICES.items():
+    else:
+        choice = get_recommendation(text)
 
-        if text.startswith(meal):
-
-            # split text using meal as separator, get choice number, then remove leading/trailing whitespace
-            choice_number = text.split(meal)[-1].strip()
-
-            try:
-                choice = choices[int(choice_number) - 1]
-            except (ValueError, IndexError):
-                choice = "Invalid choice. Please use 1 or 2."
-
+        if choice is not None:
             recommendation = "Food recommendation: " + choice
 
             # get image file path
