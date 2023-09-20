@@ -43,6 +43,8 @@ async def on_message(message):
     for meal, choices in MEAL_CHOICES.items():
 
         if text.startswith(meal):
+
+            # split text using meal as separator, get choice number, then remove leading/trailing whitespace
             choice_number = text.split(meal)[-1].strip()
 
             try:
