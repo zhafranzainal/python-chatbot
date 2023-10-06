@@ -10,9 +10,13 @@ permissions.message_content = True
 # create bot
 bot = discord.Client(intents=permissions)
 
-food1 = "Pizza"
-food2 = "Carbonara Pasta"
-food3 = "Spaghetti Aglio e Olio"
+# define a dictionary (tuples) that maps keys to their corresponding food names and prices
+FOOD_CHOICES = {
+    1: ("Pizza", 15),
+    2: ("Spaghetti Carbonara", 10),
+    3: ("Spaghetti Aglio e Olio", 8),
+}
+
 choice = ""
 quantity = ""
 
@@ -43,11 +47,13 @@ async def on_message(message):
     elif message.content.lower().startswith("$name"):
         name = message.content.split("$name ")
         text = "".join(map(str, name))
-        menu = f"Hello {text}, what do you want to eat?\n> " \
-               "1. Pizza                    RM15\n> " \
-               "2. Carbonara Pasta          RM10\n> " \
-               "3. Spaghetti Aglio e Olio   RM8\n> " \
-               "e.g. $food 2"
+
+        menu = f"Hello {text}, what do you want to eat?\n> "
+
+        for key, (food_name, food_price) in FOOD_CHOICES.items():
+            menu += f"{key}. {food_name.ljust(25)} RM{food_price}\n> "
+
+        menu += "e.g. $food 2"
 
         await message.channel.send(menu)
 
@@ -55,14 +61,13 @@ async def on_message(message):
         global choice
         food = message.content.split("$food ")
         text = "".join(map(str, food))
-        if int(text) == 1:
-            choice = food1
-        elif int(text) == 2:
-            choice = food2
-        elif int(text) == 3:
-            choice = food3
-        orders = f"How many {choice} do you want to order?\n> " \
-                 "e.g. $qty 5"
+
+        choice_key = int(text)
+
+        if choice_key in FOOD_CHOICES:
+            choice = FOOD_CHOICES[choice_key][0]
+            orders = f"How many {choice} do you want to order?\n> " \
+                     "e.g. $qty 5"
 
         await message.channel.send(orders)
 
@@ -76,12 +81,12 @@ async def on_message(message):
         await message.channel.send(orders_final)
 
     elif message.content.lower().startswith("y"):
-        if choice == food1:
-            price = 15
-        elif choice == food2:
-            price = 10
-        elif choice == food3:
-            price = 8
+
+        for key, (food_name, food_price) in FOOD_CHOICES.items():
+
+            if choice == food_name:
+                price = food_price
+                break
 
         total = price * int(quantity)
 
