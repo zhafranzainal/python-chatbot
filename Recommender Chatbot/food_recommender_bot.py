@@ -3,7 +3,7 @@ import discord
 
 from keep_alive import keep_alive
 
-# define a dictionary that maps meals to their corresponding food choices
+# define a dictionary (lists) that maps meals to their corresponding food choices
 MEAL_CHOICES = {
     "$breakfast": ["sandwich", "salad"],
     "$lunch": ["spaghetti", "tacos"],
