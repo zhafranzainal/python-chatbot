@@ -17,9 +17,10 @@ FOOD_CHOICES = {
     3: ("Spaghetti Aglio e Olio", 8),
 }
 
-COMMAND_NAME = "$name"
-COMMAND_FOOD = "$food"
-COMMAND_QUANTITY = "$qty"
+COMMAND_PREFIX = "$"
+COMMAND_NAME = COMMAND_PREFIX + "name "
+COMMAND_FOOD = COMMAND_PREFIX + "food "
+COMMAND_QUANTITY = COMMAND_PREFIX + "qty "
 
 choice = ""
 quantity = ""
@@ -55,7 +56,7 @@ async def on_message(message):
         menu = f"Hello {name}, what do you want to eat?\n> "
 
         for key, (food_name, food_price) in FOOD_CHOICES.items():
-            menu += f"{key}. {food_name.ljust(25)} RM{food_price}\n> "
+            menu += f"{key}. {food_name} RM{food_price}\n> "
 
         menu += f"e.g. {COMMAND_FOOD} 2"
 
