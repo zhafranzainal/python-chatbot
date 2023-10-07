@@ -22,6 +22,9 @@ class MusicBot(commands.Bot):
         }
 
 
+bot = MusicBot()
+
+
 def embed_song(song_info):
     embed = discord.Embed(title=song_info['title'], url=song_info['page_url'])
     embed.set_author(name=song_info['uploader'])
@@ -43,6 +46,11 @@ bot = commands.Bot(command_prefix="!", intents=permissions)
 async def on_ready():
     print(f"Logged in as {bot.user}")
 
+    # send message to each server it belongs to
+    for guild in bot.guilds:
+        channel = guild.system_channel
+        await channel.send(f"{bot.user} is online!")
+
 
 @bot.command(name="join", description="Joins a voice channel (if not in one yet)")
 async def join(ctx):
@@ -61,29 +69,29 @@ async def join(ctx):
 
 
 @bot.command(name="disconnect", description="Disconnects from the current voice channel")
-async def disconnect(self, ctx):
+async def disconnect(ctx):
     if ctx.author.voice.channel == ctx.voice_client.channel:
-        self.is_playing = False
-        self.queue = []
+        bot.is_playing = False
+        bot.queue = []
         await ctx.voice_client.disconnect()
     else:
         await ctx.send("You're not in the same channel as the bot!")
 
 
-async def _play_next(self, voice_client, channel, skip):
-    if not self.is_looping or skip:
-        self.queue.pop(0)
+async def _play_next(voice_client, channel, skip):
+    if not bot.is_looping or skip:
+        bot.queue.pop(0)
 
-    if self.queue:
-        next_song = self.queue[0]
+    if bot.queue:
+        next_song = bot.queue[0]
         embed = embed_song(next_song)
 
-        next_source = await discord.FFmpegOpusAudio.from_probe(next_song['link'], **self.ffmpeg_options)
+        next_source = await discord.FFmpegOpusAudio.from_probe(next_song['link'], **bot.ffmpeg_options)
 
         await channel.send(embed=embed, delete_after=60)
         voice_client.play(next_source, after=lambda x=None: _play_after(voice_client, channel))
     else:
-        self.is_playing = False
+        bot.is_playing = False
 
 
 def _play_after(voice_client, channel, skip=False):
@@ -121,7 +129,7 @@ async def _search_song(ctx, query):
 
 
 @bot.command(name="play", description="Plays a song, either via YouTube or direct video URL")
-async def play(self, ctx, *, query):
+async def play(ctx, *, query):
     if not query.startswith("https://"):
         await _search_song(ctx, query)
         return
@@ -132,7 +140,6 @@ async def play(self, ctx, *, query):
     voice_channel = ctx.voice_client
 
     with yt_dlp.YoutubeDL(ydl_options) as ydl:
-
         info = ydl.extract_info(query, download=False)
 
         song_info = {
@@ -146,17 +153,17 @@ async def play(self, ctx, *, query):
         }
 
         embed = embed_song(song_info)
-        self.queue.append(song_info)
+        bot.queue.append(song_info)
 
-        if not self.is_playing:
-            source = await discord.FFmpegOpusAudio.from_probe(song_info['link'], **self.ffmpeg_options)
-            self.is_playing = True
+        if not bot.is_playing:
+            source = await discord.FFmpegOpusAudio.from_probe(song_info['link'], **bot.ffmpeg_options)
+            bot.is_playing = True
 
             await ctx.send(embed=embed, delete_after=60)
             voice_channel.play(source, after=lambda x=None: _play_after(voice_channel, ctx.channel))
 
         else:
-            await ctx.send(f"Adding **{song_info['title']}** to queue number **{len(self.queue)}**",
+            await ctx.send(f"Adding **{song_info['title']}** to queue number **{len(bot.queue)}**",
                            delete_after=10)
 
 
@@ -179,12 +186,12 @@ async def resume(ctx):
 
 
 @bot.command(name="queue", description="Displays the current song queue")
-async def show_queue(self, ctx):
+async def show_queue(ctx):
     message = "\n> **Queue:**"
 
-    if len(self.queue) > 0:
+    if len(bot.queue) > 0:
 
-        for i, item in enumerate(self.queue):
+        for i, item in enumerate(bot.queue):
             message += f"\n> {i + 1}. {item['title']}"
 
             if i == 0:
@@ -206,13 +213,12 @@ async def skip(ctx):
 
 
 @bot.command(name="loop", description="Toggles looping for the current song")
-async def toggle_loop(self, ctx):
-    if self.is_looping:
-        self.is_looping = False
+async def toggle_loop(ctx):
+    if bot.is_looping:
+        bot.is_looping = False
         await ctx.send("Loop: **OFF**")
     else:
-        self.is_looping = True
-        await ctx.send("Loop: **ON**")
+        bot.is_looping = True
 
 
 # run bot using TOKEN from env
