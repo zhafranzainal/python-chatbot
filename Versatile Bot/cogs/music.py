@@ -39,7 +39,7 @@ class Music(commands.Cog):
 
             next_source = await discord.FFmpegOpusAudio.from_probe(next_song['link'], **self.ffmpeg_options)
 
-            await channel.send(embed=embed, delete_after=20)
+            await channel.send(embed=embed, delete_after=300)
             voice_client.play(next_source, after=lambda x=None: self._play_after(voice_client, channel))
         else:
             self.is_playing = False
@@ -58,14 +58,14 @@ class Music(commands.Cog):
     async def join(self, ctx: commands.Context):
 
         if ctx.author.voice is None:
-            await ctx.message.reply("You're not in a voice channel!")
+            await ctx.send("You're not in a voice channel!")
 
         voice_channel = ctx.author.voice.channel
 
         if ctx.voice_client is None:
             await voice_channel.connect()
         elif ctx.voice_client.channel != ctx.author.voice.channel:
-            await ctx.message.reply("The bot is in another voice channel!")
+            await ctx.send("The bot is in another voice channel!")
         else:
             await ctx.voice_client.move_to(voice_channel)
 
@@ -77,7 +77,7 @@ class Music(commands.Cog):
             self.queue = []
             await ctx.voice_client.disconnect()
         else:
-            await ctx.message.reply("You're not in the same channel as the bot!")
+            await ctx.send("You're not in the same channel as the bot!")
 
     async def _search_song(self, ctx: commands.Context, query: str):
 
@@ -87,7 +87,7 @@ class Music(commands.Cog):
         for index, result in enumerate(results):
             query_message += f"> {str(index + 1)}. {result['channel']} - {result['title']}\n"
 
-        query_obj = await ctx.message.reply(query_message, delete_after=60)
+        query_obj = await ctx.send(query_message, delete_after=60)
         reactions = ("1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣")
 
         for reaction in reactions:
@@ -142,30 +142,30 @@ class Music(commands.Cog):
                 source = await discord.FFmpegOpusAudio.from_probe(song_info['link'], **self.ffmpeg_options)
                 self.is_playing = True
 
-                await ctx.message.reply(embed=embed, delete_after=20)
+                await ctx.send(embed=embed, delete_after=300)
                 voice_channel.play(source, after=lambda x=None: self._play_after(voice_channel, ctx.message.channel))
 
             else:
-                await ctx.message.reply(f"Adding **{song_info['title']}** to queue number **{len(self.queue)}**",
-                                        delete_after=10)
+                await ctx.send(f"Adding **{song_info['title']}** to queue number **{len(self.queue)}**",
+                               delete_after=10)
 
     @commands.hybrid_command(name="pause", description="Pauses the currently playing music")
     async def pause(self, ctx: commands.Context):
 
         if ctx.author.voice.channel == ctx.voice_client.channel:
             await ctx.voice_client.pause()
-            await ctx.message.reply("Pausing music...")
+            await ctx.send("Pausing music...")
         else:
-            await ctx.message.reply("You're not in the same channel as the bot!")
+            await ctx.send("You're not in the same channel as the bot!")
 
     @commands.hybrid_command(name="resume", description="Resumes the currently paused music")
     async def resume(self, ctx: commands.Context):
 
         if ctx.author.voice.channel == ctx.voice_client.channel:
             await ctx.voice_client.resume()
-            await ctx.message.reply("Resuming music...")
+            await ctx.send("Resuming music...")
         else:
-            await ctx.message.reply("You're not in the same channel as the bot!")
+            await ctx.send("You're not in the same channel as the bot!")
 
     @commands.hybrid_command(name="queue", description="Displays the current song queue")
     async def queue(self, ctx: commands.Context):
@@ -180,10 +180,10 @@ class Music(commands.Cog):
                 if i == 0:
                     message += " **[NOW PLAYING]**"
 
-            await ctx.message.reply(message, delete_after=10)
+            await ctx.send(message, delete_after=10)
 
         else:
-            await ctx.message.reply("There are no songs in the queue!", delete_after=10)
+            await ctx.send("There are no songs in the queue!", delete_after=10)
 
     @commands.hybrid_command(name="skip", description="Skips the current song")
     async def skip(self, ctx: commands.Context):
@@ -192,17 +192,17 @@ class Music(commands.Cog):
 
         if ctx.author.voice.channel == voice_client.channel:
             voice_client.stop()
-            await ctx.message.reply("Skipping current song", delete_after=5)
+            await ctx.send("Skipping current song", delete_after=5)
 
     @commands.hybrid_command(name="loop", description="Toggles looping for the current song")
     async def loop(self, ctx: commands.Context):
 
         if self.is_looping:
             self.is_looping = False
-            await ctx.message.reply("Loop: **OFF**")
+            await ctx.send("Loop: **OFF**")
         else:
             self.is_looping = True
-            await ctx.message.reply("Loop: **ON**")
+            await ctx.send("Loop: **ON**")
 
 
 async def setup(bot: commands.Bot):
