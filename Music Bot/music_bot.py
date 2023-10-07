@@ -1,12 +1,25 @@
 # pip install PyNaCl
 # https://ffmpeg.org/download.html
 
+import os
 import discord
 import asyncio
 import yt_dlp
 
 from discord.ext import commands
 from youtube_search import YoutubeSearch
+
+
+class MusicBot(commands.Bot):
+    def __init__(self):
+        self.voice_channel = None
+        self.is_playing = False
+        self.is_looping = False
+        self.queue = []
+        self.ffmpeg_options = {
+            'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+            'options': '-vn'
+        }
 
 
 def embed_song(song_info):
@@ -23,16 +36,7 @@ permissions = discord.Intents.default()
 permissions.message_content = True
 
 # create bot
-bot = commands.Bot(intents=permissions)
-
-ffmpeg_options = {
-    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
-    'options': '-vn'
-}
-
-queue = []
-is_playing = False
-is_looping = False
+bot = commands.Bot(command_prefix="!", intents=permissions)
 
 
 @bot.event
@@ -57,31 +61,29 @@ async def join(ctx):
 
 
 @bot.command(name="disconnect", description="Disconnects from the current voice channel")
-async def disconnect(ctx):
+async def disconnect(self, ctx):
     if ctx.author.voice.channel == ctx.voice_client.channel:
-        global is_playing, queue
-        is_playing = False
-        queue = []
+        self.is_playing = False
+        self.queue = []
         await ctx.voice_client.disconnect()
     else:
         await ctx.send("You're not in the same channel as the bot!")
 
 
-async def _play_next(voice_client, channel, skip):
-    if not is_looping or skip:
-        queue.pop(0)
+async def _play_next(self, voice_client, channel, skip):
+    if not self.is_looping or skip:
+        self.queue.pop(0)
 
-    if queue:
-        next_song = queue[0]
+    if self.queue:
+        next_song = self.queue[0]
         embed = embed_song(next_song)
 
-        next_source = await discord.FFmpegOpusAudio.from_probe(next_song['link'], **ffmpeg_options)
+        next_source = await discord.FFmpegOpusAudio.from_probe(next_song['link'], **self.ffmpeg_options)
 
         await channel.send(embed=embed, delete_after=60)
         voice_client.play(next_source, after=lambda x=None: _play_after(voice_client, channel))
     else:
-        global is_playing
-        is_playing = False
+        self.is_playing = False
 
 
 def _play_after(voice_client, channel, skip=False):
@@ -119,7 +121,7 @@ async def _search_song(ctx, query):
 
 
 @bot.command(name="play", description="Plays a song, either via YouTube or direct video URL")
-async def play(ctx, *, query):
+async def play(self, ctx, *, query):
     if not query.startswith("https://"):
         await _search_song(ctx, query)
         return
@@ -144,18 +146,17 @@ async def play(ctx, *, query):
         }
 
         embed = embed_song(song_info)
-        queue.append(song_info)
+        self.queue.append(song_info)
 
-        if not is_playing:
-            source = await discord.FFmpegOpusAudio.from_probe(song_info['link'], **ffmpeg_options)
-            global is_playing
+        if not self.is_playing:
+            source = await discord.FFmpegOpusAudio.from_probe(song_info['link'], **self.ffmpeg_options)
             is_playing = True
 
             await ctx.send(embed=embed, delete_after=60)
             voice_channel.play(source, after=lambda x=None: _play_after(voice_channel, ctx.channel))
 
         else:
-            await ctx.send(f"Adding **{song_info['title']}** to queue number **{len(queue)}**",
+            await ctx.send(f"Adding **{song_info['title']}** to queue number **{len(self.queue)}**",
                            delete_after=10)
 
 
@@ -178,12 +179,12 @@ async def resume(ctx):
 
 
 @bot.command(name="queue", description="Displays the current song queue")
-async def show_queue(ctx):
+async def show_queue(self, ctx):
     message = "\n> **Queue:**"
 
-    if len(queue) > 0:
+    if len(self.queue) > 0:
 
-        for i, item in enumerate(queue):
+        for i, item in enumerate(self.queue):
             message += f"\n> {i + 1}. {item['title']}"
 
             if i == 0:
@@ -205,14 +206,14 @@ async def skip(ctx):
 
 
 @bot.command(name="loop", description="Toggles looping for the current song")
-async def toggle_loop(ctx):
-    global is_looping
-    is_looping = not is_looping
-    if is_looping:
-        await ctx.send("Loop: **ON**")
-    else:
+async def toggle_loop(self, ctx):
+    if self.is_looping:
+        self.is_looping = False
         await ctx.send("Loop: **OFF**")
+    else:
+        self.is_looping = True
+        await ctx.send("Loop: **ON**")
 
 
 # run bot using TOKEN from env
-bot.run('YOUR_BOT_TOKEN')
+bot.run(os.environ['TOKEN'])
