@@ -101,7 +101,6 @@ class Music(commands.Cog):
         except asyncio.TimeoutError:
             await ctx.send("Too slow!", ephemeral=True)
         else:
-            await query_obj.delete()
             await self.play(ctx, query="https://youtube.com" + results[reactions.index(reaction.emoji)]["url_suffix"])
 
     @commands.hybrid_command(name="play", description="Plays a song, either via YouTube or direct video URL")
