@@ -1,2 +1,5 @@
 
 *.pyc
+Versatile Bot/cogs/ffmpeg/bin/ffmpeg.exe
+Versatile Bot/cogs/ffmpeg/bin/ffplay.exe
+Versatile Bot/cogs/ffmpeg/bin/ffprobe.exe
