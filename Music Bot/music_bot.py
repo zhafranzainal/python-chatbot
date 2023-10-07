@@ -150,7 +150,7 @@ async def play(self, ctx, *, query):
 
         if not self.is_playing:
             source = await discord.FFmpegOpusAudio.from_probe(song_info['link'], **self.ffmpeg_options)
-            is_playing = True
+            self.is_playing = True
 
             await ctx.send(embed=embed, delete_after=60)
             voice_channel.play(source, after=lambda x=None: _play_after(voice_channel, ctx.channel))
