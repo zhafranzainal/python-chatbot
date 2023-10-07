@@ -50,11 +50,11 @@ class Music(commands.Cog):
 
     def _play_after(self, voice_client: discord.VoiceClient, channel: discord.TextChannel, skip: bool = False):
 
-        coro = self._play_next(voice_client, channel, skip)
-        fut = asyncio.run_coroutine_threadsafe(coro, self.bot.loop)
+        coroutine = self._play_next(voice_client, channel, skip)
+        future = asyncio.run_coroutine_threadsafe(coroutine, self.bot.loop)
 
         try:
-            fut.result()
+            future.result()
         except Exception:
             pass
 
