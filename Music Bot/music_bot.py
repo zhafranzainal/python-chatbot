@@ -12,6 +12,10 @@ from youtube_search import YoutubeSearch
 
 class MusicBot(commands.Bot):
     def __init__(self):
+        permissions = discord.Intents.default()
+        permissions.message_content = True
+
+        super().__init__(command_prefix="!", intents=permissions, case_insensitive=True)
         self.voice_channel = None
         self.is_playing = False
         self.is_looping = False
@@ -34,14 +38,6 @@ def embed_song(song_info):
     return embed
 
 
-# create default set of intents then enable intent to receive message content
-permissions = discord.Intents.default()
-permissions.message_content = True
-
-# create bot
-bot = commands.Bot(command_prefix="!", intents=permissions)
-
-
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}")
@@ -50,6 +46,7 @@ async def on_ready():
     for guild in bot.guilds:
         channel = guild.system_channel
         await channel.send(f"{bot.user} is online!")
+        await bot.tree.sync()
 
 
 @bot.command(name="join", description="Joins a voice channel (if not in one yet)")
