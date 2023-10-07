@@ -15,11 +15,18 @@ designed to enhance your Discord server experience with unique features.
 2. **Quote Bot**: This bot fetches and shares inspirational quotes using the ZenQuotes API. It's perfect
    for adding a touch of motivation to your server.
 
-3. **Translation Bot**: Communicate with users from around the world! This bot translates messages from one language to
+3. **Translator Bot**: Communicate with users from around the world! This bot translates messages from one language to
    another using the Google Translate API.
 
-4. **Horoscope Bot**: Dive into the world of astrology! This bot provides daily horoscopes based on zodiac signs,
+4. **Daily Horoscope Bot**: Dive into the world of astrology! This bot provides daily horoscopes based on zodiac signs,
    complete with captivating zodiac sign images.
+
+5. **Food Recommender Bot**: This bot offers meal recommendations for different times of the day - breakfast, lunch, and
+   dinner. It responds to user requests with a variety of food choices, making it a handy tool for deciding what to eat
+   with images of the recommended foods for a visual delight.
+
+6. **Food Ordering Bot**: This bot guides users through the process of ordering food, displaying a menu with options,
+   calculating the total bill, and confirming the order.
 
 ## Usage
 
