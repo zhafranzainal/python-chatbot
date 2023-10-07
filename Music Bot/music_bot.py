@@ -214,4 +214,5 @@ async def toggle_loop(ctx):
         await ctx.send("Loop: **OFF**")
 
 
+# run bot using TOKEN from env
 bot.run('YOUR_BOT_TOKEN')
