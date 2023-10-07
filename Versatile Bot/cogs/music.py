@@ -1,4 +1,5 @@
 # pip install PyNaCl
+# https://ffmpeg.org/download.html
 
 import discord
 import asyncio
