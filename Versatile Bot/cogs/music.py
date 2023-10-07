@@ -9,6 +9,15 @@ from discord.ext import commands
 from youtube_search import YoutubeSearch
 
 
+def embed_song(song_info):
+    embed = discord.Embed(title=song_info['title'], url=song_info['page_url'])
+    embed.set_author(name=song_info['uploader'])
+    embed.set_image(url=song_info['thumbnail'])
+    embed.add_field(name="Duration", value=song_info['duration'], inline=True)
+    embed.add_field(name="Requested by", value=song_info['author'], inline=True)
+    return embed
+
+
 class Music(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
@@ -30,16 +39,11 @@ class Music(commands.Cog):
 
         if self.queue:
             next_song = self.queue[0]
-            embed = discord.Embed(title=next_song['title'], url=next_song['page_url'])
-
-            embed.set_author(name=next_song['uploader'])
-            embed.set_image(url=next_song['thumbnail'])
-            embed.add_field(name="Duration", value=next_song['duration'], inline=True)
-            embed.add_field(name="Requested by", value=next_song['author'], inline=True)
+            embed = embed_song(next_song)
 
             next_source = await discord.FFmpegOpusAudio.from_probe(next_song['link'], **self.ffmpeg_options)
 
-            await channel.send(embed=embed, delete_after=300)
+            await channel.send(embed=embed, delete_after=60)
             voice_client.play(next_source, after=lambda x=None: self._play_after(voice_client, channel))
         else:
             self.is_playing = False
@@ -129,19 +133,14 @@ class Music(commands.Cog):
                 'link': info['url']
             }
 
-            embed = discord.Embed(title=song_info['title'], url=song_info['page_url'])
-            embed.set_author(name=song_info['uploader'])
-            embed.set_image(url=song_info['thumbnail'])
-            embed.add_field(name="Duration", value=song_info['duration'], inline=True)
-            embed.add_field(name="Requested by", value=song_info['author'], inline=True)
-
+            embed = embed_song(song_info)
             self.queue.append(song_info)
 
             if not self.is_playing:
                 source = await discord.FFmpegOpusAudio.from_probe(song_info['link'], **self.ffmpeg_options)
                 self.is_playing = True
 
-                await ctx.send(embed=embed, delete_after=300)
+                await ctx.send(embed=embed, delete_after=60)
                 voice_channel.play(source, after=lambda x=None: self._play_after(voice_channel, ctx.message.channel))
 
             else:
