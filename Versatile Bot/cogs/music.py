@@ -1,3 +1,5 @@
+# pip install PyNaCl
+
 import discord
 import asyncio
 import yt_dlp
