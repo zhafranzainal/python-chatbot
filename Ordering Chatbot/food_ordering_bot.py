@@ -17,6 +17,10 @@ FOOD_CHOICES = {
     3: ("Spaghetti Aglio e Olio", 8),
 }
 
+COMMAND_NAME = "$name"
+COMMAND_FOOD = "$food"
+COMMAND_QUANTITY = "$qty"
+
 choice = ""
 quantity = ""
 
@@ -38,17 +42,17 @@ async def on_message(message):
         return
 
     if message.content.lower().startswith("$hello"):
+
         response = "Hello!\n> Welcome to Pizza Hub\n> " \
                    "What's your name?\n> " \
                    "Type $name [your name]"
 
         await message.channel.send(response)
 
-    elif message.content.lower().startswith("$name"):
-        name = message.content.split("$name ")
-        text = "".join(map(str, name))
+    elif message.content.lower().startswith(COMMAND_NAME):
 
-        menu = f"Hello {text}, what do you want to eat?\n> "
+        name = message.content[len(COMMAND_NAME):]
+        menu = f"Hello {name}, what do you want to eat?\n> "
 
         for key, (food_name, food_price) in FOOD_CHOICES.items():
             menu += f"{key}. {food_name.ljust(25)} RM{food_price}\n> "
@@ -57,12 +61,11 @@ async def on_message(message):
 
         await message.channel.send(menu)
 
-    elif message.content.lower().startswith("$food"):
-        global choice
-        food = message.content.split("$food ")
-        text = "".join(map(str, food))
+    elif message.content.lower().startswith(COMMAND_FOOD):
 
-        choice_key = int(text)
+        global choice
+        food = message.content[len(COMMAND_FOOD):]
+        choice_key = int(food)
 
         if choice_key in FOOD_CHOICES:
             choice = FOOD_CHOICES[choice_key][0]
@@ -71,10 +74,11 @@ async def on_message(message):
 
         await message.channel.send(orders)
 
-    elif message.content.lower().startswith("$qty"):
+    elif message.content.lower().startswith(COMMAND_QUANTITY):
+
         global quantity
-        qty = message.content.split("$qty ")
-        quantity = "".join(map(str, qty))
+        quantity = message.content[len(COMMAND_QUANTITY):]
+
         orders_final = f"Are you sure you want to buy {quantity} {choice}?\n> " \
                        "(y/n)"
 
