@@ -45,7 +45,7 @@ async def on_message(message):
 
         response = "Hello!\n> Welcome to Pizza Hub\n> " \
                    "What's your name?\n> " \
-                   "Type $name [your name]"
+                   f"Type {COMMAND_NAME} [your name]"
 
         await message.channel.send(response)
 
@@ -57,7 +57,7 @@ async def on_message(message):
         for key, (food_name, food_price) in FOOD_CHOICES.items():
             menu += f"{key}. {food_name.ljust(25)} RM{food_price}\n> "
 
-        menu += "e.g. $food 2"
+        menu += f"e.g. {COMMAND_FOOD} 2"
 
         await message.channel.send(menu)
 
@@ -70,7 +70,7 @@ async def on_message(message):
         if choice_key in FOOD_CHOICES:
             choice = FOOD_CHOICES[choice_key][0]
             orders = f"How many {choice} do you want to order?\n> " \
-                     "e.g. $qty 5"
+                     f"e.g. {COMMAND_QUANTITY} 5"
 
         await message.channel.send(orders)
 
